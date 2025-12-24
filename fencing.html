@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Fencing Strategy Advisor</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style>
+body {
+  font-family: Arial, sans-serif;
+  background: #f4f6f8;
+  margin: 0;
+  padding: 15px;
+}
+h1 { text-align: center; }
+.section {
+  background: white;
+  margin-bottom: 15px;
+  padding: 12px;
+  border-radius: 10px;
+}
+.section h2 {
+  margin-top: 0;
+  font-size: 18px;
+}
+.btn-group button {
+  margin: 4px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid #999;
+  background: #eee;
+  cursor: pointer;
+}
+.btn-group button.active {
+  background: #007bff;
+  color: white;
+}
+textarea {
+  width: 100%;
+  border-radius: 8px;
+  padding: 8px;
+}
+#submit {
+  width: 100%;
+  padding: 14px;
+  font-size: 18px;
+  background: #28a745;
+  color: white;
+  border: none;
+  border-radius: 10px;
+}
+#output {
+  white-space: pre-wrap;
+  margin-top: 15px;
+  background: #111;
+  color: #0f0;
+  padding: 15px;
+  border-radius: 10px;
+}
+</style>
+</head>
+
+<body>
+
+<h1>Fencing Strategy Advisor</h1>
+
+<!-- DISTANCE & OPENING -->
+<div class="section">
+<h2>Opening Distance & First Reaction</h2>
+<div class="btn-group" id="opening_distance">
+  <button onclick="select(this)">Steps forward fast</button>
+  <button onclick="select(this)">Holds ground</button>
+  <button onclick="select(this)">Retreats immediately</button>
+</div>
+
+<div class="btn-group" id="opening_action">
+  <button onclick="select(this)">Immediate attack</button>
+  <button onclick="select(this)">Beat attack</button>
+  <button onclick="select(this)">Compound / feints</button>
+  <button onclick="select(this)">Does nothing</button>
+</div>
+</div>
+
+<!-- ATTACK STYLE -->
+<div class="section">
+<h2>Attack Characteristics</h2>
+<div class="btn-group" id="attack_line">
+  <button onclick="select(this)">Finishes high line</button>
+  <button onclick="select(this)">Finishes low line</button>
+</div>
+
+<div class="btn-group" id="attack_form">
+  <button onclick="select(this)">Simple lunge</button>
+  <button onclick="select(this)">Fleche</button>
+  <button onclick="select(this)">Multiple feints</button>
+</div>
+
+<div class="btn-group" id="attack_timing">
+  <button onclick="select(this)">After 2–3 prep steps</button>
+  <button onclick="select(this)">Sudden from far</button>
+</div>
+</div>
+
+<!-- DEFENSE -->
+<div class="section">
+<h2>Defensive Reactions</h2>
+<div class="btn-group" id="defense">
+  <button onclick="select(this)">Hits in preparation</button>
+  <button onclick="select(this)">Parry 4</button>
+  <button onclick="select(this)">Parry 6</button>
+  <button onclick="select(this)">Runs away</button>
+  <button onclick="select(this)">Baits counter‑attack</button>
+</div>
+</div>
+
+<!-- PSYCHOLOGY -->
+<div class="section">
+<h2>Under Pressure (close score / losing)</h2>
+<div class="btn-group" id="pressure">
+  <button onclick="select(this)">Becomes aggressive</button>
+  <button onclick="select(this)">Becomes passive</button>
+  <button onclick="select(this)">Panics / predictable</button>
+</div>
+</div>
+
+<!-- WEAKNESSES -->
+<div class="section">
+<h2>Observed Weaknesses</h2>
+<div class="btn-group" id="weaknesses">
+  <button onclick="select(this)">Weak at close distance</button>
+  <button onclick="select(this)">Overreacts to feints</button>
+  <button onclick="select(this)">Poor low‑line defense</button>
+  <button onclick="select(this)">Same rhythm every time</button>
+</div>
+</div>
+
+<!-- YOUR CONDITION -->
+<div class="section">
+<h2>Your Current Condition</h2>
+<textarea id="your_condition" rows="3"
+placeholder="e.g. tired legs, wrist pain, nervous, confident, just warmed up"></textarea>
+</div>
+
+<button id="submit" onclick="sendData()">Get Strategy</button>
+
+<div id="output">Waiting for input...</div>
+
+<script>
+function select(btn) {
+  const group = btn.parentNode;
+  [...group.children].forEach(b => b.classList.remove("active"));
+  btn.classList.add("active");
+}
+
+function getSelected(id) {
+  const buttons = document.getElementById(id).children;
+  for (let b of buttons) {
+    if (b.classList.contains("active")) return b.innerText;
+  }
+  return "";
+}
+
+async function sendData() {
+  const payload = {
+    opening_distance: getSelected("opening_distance"),
+    opening_action: getSelected("opening_action"),
+    attack_line: getSelected("attack_line"),
+    attack_form: getSelected("attack_form"),
+    attack_timing: getSelected("attack_timing"),
+    defense: getSelected("defense"),
+    pressure: getSelected("pressure"),
+    weaknesses: getSelected("weaknesses"),
+    your_condition: document.getElementById("your_condition").value
+  };
+
+  document.getElementById("output").innerText = "Analyzing...";
+
+  const res = await fetch("/analyze", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload)
+  });
+
+  const data = await res.json();
+  document.getElementById("output").innerText = data.strategy;
+}
+</script>
+
+</body>
+</html>
