@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Fencing Strategy Advisor</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 16px;
+      background: #f7f7f7;
+    }
+
+    h1 {
+      text-align: center;
+    }
+
+    .section {
+      background: white;
+      padding: 14px;
+      margin-bottom: 16px;
+      border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    }
+
+    h3 {
+      margin-top: 0;
+    }
+
+    button.option {
+      margin: 4px;
+      padding: 8px 12px;
+      border-radius: 6px;
+      border: none;
+      background: #007bff;
+      color: white;
+      cursor: pointer;
+    }
+
+    button.option.selected {
+      background: #28a745;
+    }
+
+    select, textarea {
+      width: 100%;
+      padding: 8px;
+      margin-top: 6px;
+      border-radius: 6px;
+    }
+
+    textarea {
+      height: 80px;
+    }
+
+    .toggle {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .toggle label {
+      cursor: pointer;
+    }
+
+    .submit-btn {
+      width: 100%;
+      padding: 14px;
+      font-size: 16px;
+      background: #111;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+
+    .output {
+      background: #111;
+      color: #0f0;
+      padding: 14px;
+      border-radius: 10px;
+      min-height: 80px;
+      white-space: pre-wrap;
+      font-family: monospace;
+    }
+  </style>
+</head>
+
+<body>
+
+<h1>🤺 Strategy Advisor</h1>
+
+<!-- ================= OPPONENT ================= -->
+<div class="section">
+  <h3>Opponent Behaviour</h3>
+
+  <strong>Distance</strong><br>
+  <button class="option" data-field="distance" data-value="forward">Forward</button>
+  <button class="option" data-field="distance" data-value="wait">Wait</button>
+  <button class="option" data-field="distance" data-value="back">Back</button>
+
+  <br><br><strong>Attack Style</strong><br>
+  <button class="option" data-field="attack_style" data-value="simple">Simple</button>
+  <button class="option" data-field="attack_style" data-value="beat">Beat</button>
+  <button class="option" data-field="attack_style" data-value="compound">Compound</button>
+  <button class="option" data-field="attack_style" data-value="fleche">Fleche</button>
+
+  <br><br><strong>Finish Line</strong><br>
+  <button class="option" data-field="finish" data-value="high">High</button>
+  <button class="option" data-field="finish" data-value="low">Low</button>
+
+  <br><br><strong>Defence</strong><br>
+  <button class="option" data-field="defence" data-value="parry4">Parry 4</button>
+  <button class="option" data-field="defence" data-value="parry6">Parry 6</button>
+  <button class="option" data-field="defence" data-value="counter">Counter</button>
+</div>
+
+<!-- ================= YOU ================= -->
+<div class="section">
+  <h3>Your State</h3>
+
+  <label>Your Condition</label>
+  <select id="condition">
+    <option value="fresh">Fresh</option>
+    <option value="tired">Tired</option>
+    <option value="injured">Injured</option>
+  </select>
+
+  <div class="toggle">
+    <label>
+      <input type="radio" name="detail" value="normal" checked>
+      Normal
+    </label>
+    <label>
+      <input type="radio" name="detail" value="detailed">
+      Detailed
+    </label>
+  </div>
+</div>
+
+<button class="submit-btn" onclick="getAdvice()">Get Strategy</button>
+
+<br><br>
+
+<div class="section">
+  <h3>Advice</h3>
+  <div class="output" id="output">Waiting for input…</div>
+</div>
+
+<script>
+const state = {};
+
+document.querySelectorAll(".option").forEach(btn => {
+  btn.onclick = () => {
+    const field = btn.dataset.field;
+    document.querySelectorAll(`[data-field="${field}"]`)
+      .forEach(b => b.classList.remove("selected"));
+    btn.classList.add("selected");
+    state[field] = btn.dataset.value;
+  };
+});
+
+async function getAdvice() {
+  const detail = document.querySelector('input[name="detail"]:checked').value;
+
+  const payload = {
+    opponent: state,
+    condition: document.getElementById("condition").value,
+    detail_level: detail
+  };
+
+  document.getElementById("output").innerText = "Thinking…";
+
+  const res = await fetch(
+    "https://YOUR_PROJECT_REF.supabase.co/functions/v1/strategy-advisor",
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    }
+  );
+
+  const data = await res.json();
+  document.getElementById("output").innerText = data.advice || "No advice returned.";
+}
+</script>
+
+</body>
+</html>
