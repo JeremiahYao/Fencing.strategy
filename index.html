@@ -171,10 +171,14 @@ async function getAdvice() {
   document.getElementById("output").innerText = "Thinking…";
 
   const res = await fetch(
-    "https://YOUR_PROJECT_REF.supabase.co/functions/v1/strategy-advisor",
+    "https://uwprqsnidvdhchcipsvr.supabase.co/functions/v1/strategy-advisor",
     {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+  "Content-Type": "application/json",
+  "apikey": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV3cHJxc25pZHZkaGNoY2lwc3ZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU2OTU1MzUsImV4cCI6MjA4MTI3MTUzNX0._et7WH9IQlMFtYbZg-UF9D5iucz92coNE8LfGAWeaOQ",
+  "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV3cHJxc25pZHZkaGNoY2lwc3ZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU2OTU1MzUsImV4cCI6MjA4MTI3MTUzNX0._et7WH9IQlMFtYbZg-UF9D5iucz92coNE8LfGAWeaOQ"
+},
       body: JSON.stringify(payload)
     }
   );
