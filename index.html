@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fencing Strategy Advisor</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    h2 {
+      color: white;
+      text-align: center;
+      margin-bottom: 24px;
+      font-size: 2em;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+    }
+
+    .section {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      transition: transform 0.2s;
+    }
+
+    .section:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+    }
+
+    h4 {
+      color: #333;
+      margin-bottom: 16px;
+      font-size: 1.3em;
+      border-bottom: 2px solid #667eea;
+      padding-bottom: 8px;
+    }
+
+    .category {
+      margin-bottom: 20px;
+    }
+
+    .category-label {
+      display: block;
+      color: #555;
+      font-weight: 600;
+      margin-bottom: 8px;
+      font-size: 0.95em;
+    }
+
+    .button-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    button {
+      padding: 10px 16px;
+      border-radius: 8px;
+      border: 2px solid #ddd;
+      background: white;
+      color: #333;
+      font-size: 0.9em;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s;
+      flex: 1;
+      min-width: 100px;
+    }
+
+    button:hover:not(:disabled) {
+      border-color: #667eea;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(102, 126, 234, 0.3);
+    }
+
+    button.selected {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border-color: #667eea;
+      box-shadow: 0 4px 8px rgba(102, 126, 234, 0.4);
+    }
+
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .primary-button {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      font-size: 1.1em;
+      font-weight: 600;
+      margin-top: 10px;
+    }
+
+    .primary-button:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
+    }
+
+    .primary-button:disabled {
+      background: #ccc;
+    }
+
+    textarea, select {
+      width: 100%;
+      padding: 12px;
+      border: 2px solid #ddd;
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 0.95em;
+      transition: border-color 0.3s;
+      margin-top: 8px;
+    }
+
+    textarea {
+      min-height: 80px;
+      resize: vertical;
+    }
+
+    textarea:focus, select:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    label {
+      display: block;
+      color: #555;
+      font-weight: 600;
+      margin-bottom: 4px;
+      font-size: 0.95em;
+    }
+
+    .output {
+      background: #1a1a1a;
+      color: #00ff00;
+      padding: 20px;
+      border-radius: 8px;
+      white-space: pre-wrap;
+      font-family: 'Courier New', monospace;
+      font-size: 0.9em;
+      line-height: 1.6;
+      min-height: 100px;
+      max-height: 400px;
+      overflow-y: auto;
+    }
+
+    .output.loading {
+      color: #ffaa00;
+    }
+
+    .output.error {
+      color: #ff4444;
+    }
+
+    .status-indicator {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      margin-right: 8px;
+      background: #ccc;
+    }
+
+    .status-indicator.ready {
+      background: #00ff00;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    .reset-button {
+      background: #dc3545;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.9em;
+      margin-top: 10px;
+      transition: all 0.3s;
+    }
+
+    .reset-button:hover {
+      background: #c82333;
+      transform: translateY(-2px);
+    }
+
+    @media (max-width: 600px) {
+      body {
+        padding: 12px;
+      }
+
+      h2 {
+        font-size: 1.5em;
+      }
+
+      .section {
+        padding: 16px;
+      }
+
+      button {
+        min-width: 80px;
+        font-size: 0.85em;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>🤺 Fencing Strategy Advisor</h2>
+    
+    <div class="section">
+      <h4>Opponent Characteristics</h4>
+      
+      <div class="category">
+        <span class="category-label">Distance Preference</span>
+        <div class="button-group">
+          <button data-category="distance_behavior" data-value="forward">Forward</button>
+          <button data-category="distance_behavior" data-value="wait">Wait</button>
+          <button data-category="distance_behavior" data-value="back">Back</button>
+        </div>
+      </div>
+
+      <div class="category">
+        <span class="category-label">Opening Action</span>
+        <div class="button-group">
+          <button data-category="opening_action" data-value="simple">Simple</button>
+          <button data-category="opening_action" data-value="beat">Beat</button>
+        </div>
+      </div>
+
+      <div class="category">
+        <span class="category-label">Attack Style</span>
+        <div class="button-group">
+          <button data-category="attack_style" data-value="compound">Compound</button>
+          <button data-category="attack_style" data-value="fleche">Flèche</button>
+        </div>
+      </div>
+
+      <div class="category">
+        <span class="category-label">Attack Timing</span>
+        <div class="button-group">
+          <button data-category="attack_timing" data-value="sudden">Sudden</button>
+          <button data-category="attack_timing" data-value="prepared">Prepared</button>
+        </div>
+      </div>
+
+      <div class="category">
+        <span class="category-label">Finish Target</span>
+        <div class="button-group">
+          <button data-category="finish_line" data-value="high">High</button>
+          <button data-category="finish_line" data-value="low">Low</button>
+        </div>
+      </div>
+
+      <div class="category">
+        <span class="category-label">Defense Style</span>
+        <div class="button-group">
+          <button data-category="defense" data-value="parry4">Parry 4</button>
+          <button data-category="defense" data-value="parry6">Parry 6</button>
+        </div>
+      </div>
+
+      <button class="reset-button" onclick="resetSelections()">Reset All</button>
+    </div>
+
+    <div class="section">
+      <label for="comments">Additional Observations</label>
+      <textarea id="comments" placeholder="Describe any unusual patterns, tendencies, or other relevant information about your opponent..."></textarea>
+      
+      <label for="detail">Analysis Detail Level</label>
+      <select id="detail">
+        <option value="normal">Normal</option>
+        <option value="detailed">Detailed</option>
+      </select>
+    </div>
+
+    <button class="primary-button" onclick="getAdvice()" id="adviceButton">
+      Get Strategic Advice
+    </button>
+
+    <div class="section">
+      <h4>
+        <span class="status-indicator" id="statusIndicator"></span>
+        Strategic Analysis
+      </h4>
+      <div class="output" id="output">Waiting for opponent data...</div>
+    </div>
+  </div>
+
+  <script>
+    // State management
+    const appState = {
+      opponent: {},
+      isLoading: false
+    };
+
+    // Initialize button event listeners
+    function initializeButtons() {
+      const buttons = document.querySelectorAll('button[data-category]');
+      
+      buttons.forEach(button => {
+        button.addEventListener('click', function() {
+          const category = this.dataset.category;
+          const value = this.dataset.value;
+          
+          // Remove selected class from all buttons in this category
+          document.querySelectorAll(`button[data-category="${category}"]`)
+            .forEach(btn => btn.classList.remove('selected'));
+          
+          // Add selected class to clicked button
+          this.classList.add('selected');
+          
+          // Update state
+          appState.opponent[category] = value;
+          
+          // Update status indicator
+          updateStatusIndicator();
+        });
+      });
+    }
+
+    // Update status indicator based on selections
+    function updateStatusIndicator() {
+      const indicator = document.getElementById('statusIndicator');
+      const requiredFields = ['distance_behavior', 'opening_action', 'attack_style', 'attack_timing', 'finish_line', 'defense'];
+      const filledFields = requiredFields.filter(field => appState.opponent[field]);
+      
+      if (filledFields.length === requiredFields.length) {
+        indicator.classList.add('ready');
+      } else {
+        indicator.classList.remove('ready');
+      }
+    }
+
+    // Reset all selections
+    function resetSelections() {
+      document.querySelectorAll('button[data-category]')
+        .forEach(btn => btn.classList.remove('selected'));
+      
+      appState.opponent = {};
+      document.getElementById('comments').value = '';
+      document.getElementById('detail').value = 'normal';
+      document.getElementById('output').textContent = 'Waiting for opponent data...';
+      document.getElementById('output').className = 'output';
+      updateStatusIndicator();
+    }
+
+    // Validate form before submission
+    function validateForm() {
+      if (Object.keys(appState.opponent).length < 1) {
+        return {
+          valid: false,
+          message: 'Please select at least one opponent trait.'
+        };
+      }
+      
+      return { valid: true };
+    }
+
+    // Get advice from API
+    async function getAdvice() {
+      const validation = validateForm();
+      
+      if (!validation.valid) {
+        showOutput(validation.message, 'error');
+        return;
+      }
+
+      if (appState.isLoading) {
+        return;
+      }
+
+      appState.isLoading = true;
+      const button = document.getElementById('adviceButton');
+      const output = document.getElementById('output');
+      
+      button.disabled = true;
+      button.textContent = 'Analyzing...';
+      showOutput('Connecting to strategy advisor...', 'loading');
+
+      const payload = {
+        opponent: appState.opponent,
+        comments: document.getElementById('comments').value.trim(),
+        detail_level: document.getElementById('detail').value
+      };
+
+      try {
+        const response = await fetch(
+          'https://uwprqsnidvdhchcipsvr.supabase.co/functions/v1/strategy-advisor',
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'apikey': 'YOUR_ANON_KEY',
+              'Authorization': 'Bearer YOUR_ANON_KEY'
+            },
+            body: JSON.stringify(payload)
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        
+        if (data.advice) {
+          showOutput(data.advice, 'success');
+        } else if (data.error) {
+          showOutput(`Error: ${data.error}`, 'error');
+        } else {
+          showOutput('No advice received. Please try again.', 'error');
+        }
+
+      } catch (error) {
+        console.error('Request failed:', error);
+        showOutput(
+          `Connection failed: ${error.message}\n\nPlease check:\n- Your internet connection\n- API credentials are correct\n- The endpoint URL is valid`,
+          'error'
+        );
+      } finally {
+        appState.isLoading = false;
+        button.disabled = false;
+        button.textContent = 'Get Strategic Advice';
+      }
+    }
+
+    // Display output with appropriate styling
+    function showOutput(message, type = 'success') {
+      const output = document.getElementById('output');
+      output.textContent = message;
+      output.className = 'output';
+      
+      if (type === 'loading') {
+        output.classList.add('loading');
+      } else if (type === 'error') {
+        output.classList.add('error');
+      }
+    }
+
+    // Initialize app when DOM is ready
+    document.addEventListener('DOMContentLoaded', function() {
+      initializeButtons();
+      updateStatusIndicator();
+    });
+
+    // Add keyboard support
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+        getAdvice();
+      }
+    });
+  </script>
+</body>
+</html>
