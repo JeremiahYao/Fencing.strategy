@@ -85,10 +85,13 @@ document.querySelectorAll("button[data-field]").forEach(btn => {
 });
 
 async function getAdvice() {
+  const detail = document.querySelector('input[name="detail"]:checked').value;
+
   const payload = {
     opponent: state,
     condition: document.getElementById("condition").value,
-    detail_level: document.querySelector('input[name="detail"]:checked').value
+    comments: document.getElementById("comments").value,
+    detail_level: detail
   };
 
   document.getElementById("output").innerText = "Thinking…";
@@ -99,8 +102,29 @@ async function getAdvice() {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "apikey": "YOUR_PUBLIC_ANON_KEY",
-        "Authorization": "Bearer YOUR_PUBLIC_ANON_KEY"
+        "apikey": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV3cHJxc25pZHZkaGNoY2lwc3ZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU2OTU1MzUsImV4cCI6MjA4MTI3MTUzNX0._et7WH9IQlMFtYbZg-UF9D5iucz92coNE8LfGAWeaOQ",
+        "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV3cHJxc25pZHZkaGNoY2lwc3ZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU2OTU1MzUsImV4cCI6MjA4MTI3MTUzNX0._et7WH9IQlMFtYbZg-UF9D5iucz92coNE8LfGAWeaOQ"
+      },
+      body: JSON.stringify(payload)
+    }
+  );
+
+  const data = await res.json();
+  document.getElementById("output").innerText =
+    data.advice || "No advice returned.";
+}
+
+
+  document.getElementById("output").innerText = "Thinking…";
+
+  const res = await fetch(
+    "https://uwprqsnidvdhchcipsvr.supabase.co/functions/v1/strategy-advisor",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "apikey": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV3cHJxc25pZHZkaGNoY2lwc3ZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU2OTU1MzUsImV4cCI6MjA4MTI3MTUzNX0._et7WH9IQlMFtYbZg-UF9D5iucz92coNE8LfGAWeaOQ",
+        "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV3cHJxc25pZHZkaGNoY2lwc3ZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU2OTU1MzUsImV4cCI6MjA4MTI3MTUzNX0._et7WH9IQlMFtYbZg-UF9D5iucz92coNE8LfGAWeaOQ"
       },
       body: JSON.stringify(payload)
     }
