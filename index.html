@@ -88,9 +88,14 @@ async function getAdvice() {
   const detail = document.querySelector('input[name="detail"]:checked').value;
 
   const payload = {
-    opponent: state,
-    condition: document.getElementById("condition").value,
-    comments: document.getElementById("comments").value,
+    distance_behavior: state.distance || null,
+    opening_action: state.attack_style || null,
+    attack_style: state.attack_style || null,
+    attack_timing: null,
+    finish_line: state.finish || null,
+    defense: state.defence || null,
+    pressure: null,
+    other_comments: document.getElementById("comments")?.value || "",
     detail_level: detail
   };
 
@@ -102,8 +107,7 @@ async function getAdvice() {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "apikey": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV3cHJxc25pZHZkaGNoY2lwc3ZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU2OTU1MzUsImV4cCI6MjA4MTI3MTUzNX0._et7WH9IQlMFtYbZg-UF9D5iucz92coNE8LfGAWeaOQ",
-        "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV3cHJxc25pZHZkaGNoY2lwc3ZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU2OTU1MzUsImV4cCI6MjA4MTI3MTUzNX0._et7WH9IQlMFtYbZg-UF9D5iucz92coNE8LfGAWeaOQ"
+        "apikey": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV3cHJxc25pZHZkaGNoY2lwc3ZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU2OTU1MzUsImV4cCI6MjA4MTI3MTUzNX0._et7WH9IQlMFtYbZg-UF9D5iucz92coNE8LfGAWeaOQ"
       },
       body: JSON.stringify(payload)
     }
@@ -111,8 +115,9 @@ async function getAdvice() {
 
   const data = await res.json();
   document.getElementById("output").innerText =
-    data.advice || "No advice returned.";
+    data.advice || data.error || "No advice returned.";
 }
+
 
 
   document.getElementById("output").innerText = "Thinking…";
